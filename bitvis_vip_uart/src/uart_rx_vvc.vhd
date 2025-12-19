@@ -76,6 +76,7 @@ architecture behave of uart_rx_vvc is
   alias vvc_transaction_info                : t_transaction_group is shared_uart_vvc_transaction_info(GC_CHANNEL, GC_INSTANCE_IDX);
   -- VVC Activity 
   signal entry_num_in_vvc_activity_register : integer;
+  signal vvc_registered : std_logic := '0';
 
   --UVVM: temporary fix for HVVC, remove function below in v3.0
   function get_msg_id_panel(
@@ -124,6 +125,7 @@ begin
     entry_num_in_vvc_activity_register                    <= shared_vvc_activity_register.priv_register_vvc(name     => C_VVC_NAME,
                                                                                                             instance => GC_INSTANCE_IDX,
                                                                                                             channel  => GC_CHANNEL);
+    vvc_registered <= '1';
     -- Set initial value of v_msg_id_panel to msg_id_panel in config
     v_msg_id_panel                                        := vvc_config.msg_id_panel;
 
@@ -233,6 +235,7 @@ begin
 
     loop
 
+      wait until vvc_registered = '1';
       -- update vvc activity
       update_vvc_activity_register(global_trigger_vvc_activity_register, vvc_status, INACTIVE, entry_num_in_vvc_activity_register, C_EXECUTOR_ID, last_cmd_idx_executed, command_queue.is_empty(VOID), C_SCOPE);
 
@@ -400,7 +403,8 @@ begin
   p_unwanted_activity : process
   begin
     -- Add a delay to allow the VVC to be registered in the activity register
-    wait for std.env.resolution_limit;
+    wait until vvc_registered = '1';
+    --wait for std.env.resolution_limit;
 
     loop
       -- Skip if the vvc is inactive to avoid waiting for an inactive activity register

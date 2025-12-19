@@ -73,6 +73,7 @@ architecture behave of uart_tx_vvc is
   alias vvc_transaction_info                : t_transaction_group is shared_uart_vvc_transaction_info(GC_CHANNEL, GC_INSTANCE_IDX);
   -- Activity Watchdog
   signal entry_num_in_vvc_activity_register : integer;
+  signal vvc_registered : std_logic := '0';
 
   --UVVM: temporary fix for HVVC, remove function below in v3.0
   function get_msg_id_panel(
@@ -121,6 +122,8 @@ begin
     entry_num_in_vvc_activity_register                    <= shared_vvc_activity_register.priv_register_vvc(name     => C_VVC_NAME,
                                                                                                             instance => GC_INSTANCE_IDX,
                                                                                                             channel  => GC_CHANNEL);
+
+    vvc_registered <= '1';
     -- Set initial value of v_msg_id_panel to msg_id_panel in config
     v_msg_id_panel                                        := vvc_config.msg_id_panel;
 
@@ -228,6 +231,7 @@ begin
     set_rand_seeds(C_VVC_LABELS.scope, v_seeds(0), v_seeds(1));
 
     loop
+      wait until vvc_registered = '1';
       -- update vvc activity
       update_vvc_activity_register(global_trigger_vvc_activity_register, vvc_status, INACTIVE, entry_num_in_vvc_activity_register, C_EXECUTOR_ID, last_cmd_idx_executed, command_queue.is_empty(VOID), C_SCOPE);
 
