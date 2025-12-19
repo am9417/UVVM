@@ -1,0 +1,27 @@
+UVVM: ID_CONSTRUCTOR                     0.0 ns  CLOCK_GENERATOR_VVC,1          VVC instantiated.
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  CLOCK_GENERATOR_VVC,1          Command queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  CLOCK_GENERATOR_VVC,1          Result queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CONSTRUCTOR                     0.0 ns  UART_VVC,1,TX                  VVC instantiated for channel TX
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  UART_VVC,1,TX                  Command queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  UART_VVC,1,TX                  Result queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CONSTRUCTOR                     0.0 ns  UART_VVC,1,RX                  VVC instantiated for channel RX
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  UART_VVC,1,RX                  Command queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  UART_VVC,1,RX                  Result queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CONSTRUCTOR                     0.0 ns  SBI_VVC,1                      VVC instantiated.
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  SBI_VVC,1                      Command queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CONSTRUCTOR_SUB                 0.0 ns  SBI_VVC,1                      Result queue instantiated and will give a warning when reaching 1000 elements in queue.
+UVVM: ID_CMD_INTERPRETER_WAIT            0.0 ns  CLOCK_GENERATOR_VVC,1            ..Interpreter: Waiting for command
+UVVM: ID_CMD_INTERPRETER_WAIT            0.0 ns  UART_VVC,1,TX                    ..Interpreter: Waiting for command
+UVVM: 
+UVVM: =========================================================================================================================================================================
+UVVM: ***  TB_ERROR #1  ***
+UVVM:             0 ps   TB seq.
+UVVM:                    check_value_in_range(int, 0, 1) => Failed. Value was -2147483648. Expected between 0 and 1. 'priv_get_vvc_activity() => vvc_idx invalid range:
+UVVM:                    -2147483648.'
+UVVM: 
+UVVM: Simulator has been paused as requested after 1 TB_ERROR
+UVVM: *** To find the root cause of this alert, step out the HDL calling stack in your simulator. ***
+UVVM: *** For example, step out until you reach the call from the test sequencer. ***
+UVVM: =========================================================================================================================================================================
+UVVM: 
+UVVM: 
