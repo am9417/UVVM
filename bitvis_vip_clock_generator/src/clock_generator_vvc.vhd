@@ -124,8 +124,9 @@ begin
     -- initialise shared_vvc_last_received_cmd_idx for channel and instance
     shared_vvc_last_received_cmd_idx(NA, GC_INSTANCE_IDX) := 0;
     -- Register VVC in vvc activity register
-    entry_num_in_vvc_activity_register                    <= shared_vvc_activity_register.priv_register_vvc(name     => C_VVC_NAME,
-                                                                                                            instance => GC_INSTANCE_IDX);
+        shared_vvc_activity_register.priv_register_vvc_proc(vvc_idx_out => entry_num_in_vvc_activity_register,
+                                                        name     => C_VVC_NAME,
+                                                        instance => GC_INSTANCE_IDX);
 
     vvc_registered <= '1';
     -- Set initial value of v_msg_id_panel to msg_id_panel in config

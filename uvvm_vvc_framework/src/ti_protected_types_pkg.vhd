@@ -36,6 +36,14 @@ package ti_protected_types_pkg is
       constant num_executors : in positive  := 1
     ) return integer;
 
+    procedure priv_register_vvc_proc (
+      signal   vvc_idx_out   : out integer;
+      constant name          : in string;
+      constant instance      : in natural;
+      constant channel       : in t_channel := NA;
+      constant num_executors : in positive  := 1
+    );
+
     -- Update a VVC's state
     procedure priv_report_vvc_activity(
       constant vvc_idx                : in natural;
@@ -231,6 +239,47 @@ package body ti_protected_types_pkg is
     variable priv_registered_vvc          : t_registered_vvc_array(0 to C_MAX_TB_VVC_NUM);
     -- Counter for the number of VVCs that has registered
     variable priv_last_registered_vvc_idx : integer                                       := -1;
+
+    procedure priv_register_vvc_proc (
+      signal   vvc_idx_out   : out integer;
+      constant name          : in string;
+      constant instance      : in natural;
+      constant channel       : in t_channel := NA;
+      constant num_executors : in positive  := 1) is
+    begin
+      if priv_last_registered_vvc_idx >= C_MAX_TB_VVC_NUM then
+        alert(TB_ERROR, "Number of registered VVCs exceed C_MAX_TB_VVC_NUM.\n" & "Increase C_MAX_TB_VVC_NUM in adaptations package.");
+      end if;
+
+      -- Update register only if a duplicated VVC ID is not found in the registered VVC array.
+      if priv_get_vvc_idx(name, instance, channel) = -1 then
+        -- Set registered VVC index
+        priv_last_registered_vvc_idx                                                          := priv_last_registered_vvc_idx + 1;
+
+        -- Update register
+        priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.name                         := (others => NUL);
+        priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.name(1 to name'length)       := to_upper(name);
+        priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.instance                     := instance;
+        priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.channel                      := channel;
+        --priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.activity                  := new t_activity_array(0 to num_executors - 1);
+        priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.activity.all              := (0 to num_executors - 1 => INACTIVE);
+        priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.last_cmd_idx_executed     := -1;
+        if num_executors > 1 then -- Only VVCs with multiple executors use this list
+          --priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.pending_cmd_idx_list    := new integer_vector(0 to 0); -- Start with one element, it expands automatically
+          priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.pending_cmd_idx_list(0) := 0;
+        end if;
+      -- Alert if a duplicated VVC ID is found in the registered VVC array
+      else
+        if priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.channel = NA then
+          alert(TB_ERROR, "Instance " & to_string(instance) & " of " & to_upper(name) & " is already in use. Choose a different instance number.");
+        else
+          alert(TB_ERROR, "Instance " & to_string(instance) & " of " & to_upper(name) & ", Channel " & to_upper(to_string(channel)) & " is already in use. Choose a different instance number.");
+        end if;
+      end if;
+
+      -- Return index
+      vvc_idx_out <= priv_last_registered_vvc_idx;
+    end procedure;
 
     impure function priv_register_vvc(
       constant name          : in string;
