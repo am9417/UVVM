@@ -261,11 +261,11 @@ package body ti_protected_types_pkg is
         priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.name(1 to name'length)       := to_upper(name);
         priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.instance                     := instance;
         priv_registered_vvc(priv_last_registered_vvc_idx).vvc_id.channel                      := channel;
-        --priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.activity                  := new t_activity_array(0 to num_executors - 1);
+        priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.activity                  := new t_activity_array(0 to num_executors - 1);
         priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.activity.all              := (0 to num_executors - 1 => INACTIVE);
         priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.last_cmd_idx_executed     := -1;
         if num_executors > 1 then -- Only VVCs with multiple executors use this list
-          --priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.pending_cmd_idx_list    := new integer_vector(0 to 0); -- Start with one element, it expands automatically
+          priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.pending_cmd_idx_list    := new integer_vector(0 to 0); -- Start with one element, it expands automatically
           priv_registered_vvc(priv_last_registered_vvc_idx).vvc_state.pending_cmd_idx_list(0) := 0;
         end if;
       -- Alert if a duplicated VVC ID is found in the registered VVC array
