@@ -113,6 +113,11 @@ package ti_protected_types_pkg is
       constant vvc_idx : in natural
     ) return t_activity;
 
+    procedure priv_get_vvc_activity_proc(
+      variable activity_out : out t_activity;
+      constant vvc_idx      : in natural
+    );
+
     -- Check if the cmd_idx has been executed
     impure function priv_is_cmd_idx_executed(
       constant vvc_idx : in natural;
@@ -480,6 +485,26 @@ package body ti_protected_types_pkg is
                            "priv_get_vvc_channel() => vvc_idx invalid range: " & to_string(vvc_idx) & ".", C_TB_SCOPE_DEFAULT, ID_NEVER);
       return priv_registered_vvc(vvc_idx).vvc_id.channel;
     end function;
+
+    procedure priv_get_vvc_activity_proc(
+      variable activity_out : out t_activity;
+      constant vvc_idx : in natural
+    ) is
+      variable vout : t_activity := INACTIVE;
+    begin
+
+      check_value_in_range(vvc_idx, 0, priv_last_registered_vvc_idx, TB_ERROR,
+                           "priv_get_vvc_activity() => vvc_idx invalid range: " & to_string(vvc_idx) & ".", C_TB_SCOPE_DEFAULT, ID_NEVER);
+      for i in priv_registered_vvc(vvc_idx).vvc_state.activity'range loop
+        if priv_registered_vvc(vvc_idx).vvc_state.activity(i) = ACTIVE then
+          vout := ACTIVE;
+        end if;
+      end loop;
+      
+      activity_out := vout;
+
+    end procedure;
+
 
     impure function priv_get_vvc_activity(
       constant vvc_idx : in natural

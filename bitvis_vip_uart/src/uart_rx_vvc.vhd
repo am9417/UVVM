@@ -402,6 +402,7 @@ begin
   -- - Monitors unwanted activity from the DUT
   --===============================================================================================
   p_unwanted_activity : process
+    variable v_activity : t_activity;
   begin
     -- Add a delay to allow the VVC to be registered in the activity register
     wait until vvc_registered = '1';
@@ -409,11 +410,13 @@ begin
 
     loop
       -- Skip if the vvc is inactive to avoid waiting for an inactive activity register
-      if shared_vvc_activity_register.priv_get_vvc_activity(entry_num_in_vvc_activity_register) = ACTIVE then
+      shared_vvc_activity_register.priv_get_vvc_activity_proc(v_activity, entry_num_in_vvc_activity_register);
+      if v_activity = ACTIVE then
         -- Wait until the vvc is inactive
         loop
           wait on global_trigger_vvc_activity_register;
-          if shared_vvc_activity_register.priv_get_vvc_activity(entry_num_in_vvc_activity_register) = INACTIVE then
+          shared_vvc_activity_register.priv_get_vvc_activity_proc(v_activity, entry_num_in_vvc_activity_register);
+          if v_activity = INACTIVE then
             exit;
           end if;
         end loop;
@@ -422,7 +425,8 @@ begin
       wait on uart_vvc_rx, global_trigger_vvc_activity_register;
 
       -- Check the changes on the DUT output only when the vvc is inactive
-      if shared_vvc_activity_register.priv_get_vvc_activity(entry_num_in_vvc_activity_register) = INACTIVE then
+      shared_vvc_activity_register.priv_get_vvc_activity_proc(v_activity, entry_num_in_vvc_activity_register);
+      if v_activity = INACTIVE then
         check_unwanted_activity(uart_vvc_rx, vvc_config.unwanted_activity_severity, "The DUT TX output", C_SCOPE);
       end if;
     end loop;
