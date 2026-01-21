@@ -11,9 +11,9 @@
 .\compile_xsim.ps1 bitvis_uart
 
 # Compile demo TB
-xvhdl --2019 -work bitvis_uart ..\bitvis_uart\tb\uart_vvc_demo_th.vhd
-xvhdl --2019 -work bitvis_uart ..\bitvis_uart\tb\uart_vvc_demo_tb.vhd
+xvhdl -v 2 --2019 -work bitvis_uart ..\bitvis_uart\tb\uart_vvc_demo_th.vhd
+xvhdl -v 2 --2019 -work bitvis_uart ..\bitvis_uart\tb\uart_vvc_demo_tb.vhd
 
 # Elaborate and run
-xelab bitvis_uart.uart_vvc_demo_tb
-xsim --R bitvis_uart.uart_vvc_demo_tb
+xelab -v 2 bitvis_uart.uart_vvc_demo_tb
+xsim -stats -nosignalhandlers --R bitvis_uart.uart_vvc_demo_tb
