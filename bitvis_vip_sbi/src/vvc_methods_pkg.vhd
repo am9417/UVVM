@@ -241,7 +241,7 @@ package body vvc_methods_pkg is
     constant scope               : in string         := C_VVC_CMD_SCOPE_DEFAULT;
     constant parent_msg_id_panel : in t_msg_id_panel := C_UNUSED_MSG_ID_PANEL -- Only intended for usage by parent HVVCs
   ) is
-    constant C_PROC_NAME : string := get_procedure_name_from_instance_name(vvc_instance_idx'instance_name);
+    constant C_PROC_NAME : string := "sbi_write";
     constant C_PROC_CALL : string := C_PROC_NAME & "(" & to_string(VVCT, vvc_instance_idx) -- First part common for all
                                      & ", " & to_string(addr, HEX, KEEP_LEADING_0, INCL_RADIX) & ", " & to_string(data, HEX, KEEP_LEADING_0, INCL_RADIX) & ")";
     variable v_normalised_addr : unsigned(shared_vvc_cmd.addr'length - 1 downto 0)         := normalize_and_check(addr, shared_vvc_cmd.addr, ALLOW_WIDER_NARROWER, "addr", "shared_vvc_cmd.addr", C_PROC_CALL & " called with too wide address." & add_msg_delimiter(msg));
@@ -271,7 +271,7 @@ package body vvc_methods_pkg is
     constant scope               : in string         := C_VVC_CMD_SCOPE_DEFAULT;
     constant parent_msg_id_panel : in t_msg_id_panel := C_UNUSED_MSG_ID_PANEL -- Only intended for usage by parent HVVCs
   ) is
-    constant C_PROC_NAME : string := get_procedure_name_from_instance_name(vvc_instance_idx'instance_name);
+    constant C_PROC_NAME : string := "sbi_write";
     constant C_PROC_CALL : string := C_PROC_NAME & "(" & to_string(VVCT, vvc_instance_idx) -- First part common for all
                                      & ", " & to_string(addr, HEX, KEEP_LEADING_0, INCL_RADIX) & ", " & to_string(num_words) & ", " & to_upper(to_string(randomisation)) & ")";
     variable v_normalised_addr : unsigned(shared_vvc_cmd.addr'length - 1 downto 0) := normalize_and_check(addr, shared_vvc_cmd.addr, ALLOW_WIDER_NARROWER, "addr", "shared_vvc_cmd.addr", C_PROC_CALL & " called with too wide address." & add_msg_delimiter(msg));
@@ -301,7 +301,7 @@ package body vvc_methods_pkg is
     constant parent_msg_id_panel : in t_msg_id_panel := C_UNUSED_MSG_ID_PANEL; -- Only intended for usage by parent HVVCs
     constant ext_proc_call       : in string         := ""
   ) is
-    constant C_PROC_NAME       : string := get_procedure_name_from_instance_name(vvc_instance_idx'instance_name);
+    constant C_PROC_NAME       : string := "sbi_read";
     constant C_PROC_CALL       : string := C_PROC_NAME & "(" & to_string(VVCT, vvc_instance_idx) -- First part common for all
                                            & ", " & to_string(addr, HEX, KEEP_LEADING_0, INCL_RADIX) & ", " & to_upper(to_string(data_routing)) & ")";
     constant C_LOCAL_PROC_CALL : string := return_string1_if_true_otherwise_string2(C_PROC_CALL, ext_proc_call, ext_proc_call = "");
@@ -329,7 +329,7 @@ package body vvc_methods_pkg is
     constant scope               : in string         := C_VVC_CMD_SCOPE_DEFAULT;
     constant parent_msg_id_panel : in t_msg_id_panel := C_UNUSED_MSG_ID_PANEL -- Only intended for usage by parent HVVCs
   ) is
-    constant C_PROC_NAME : string := get_procedure_name_from_instance_name(vvc_instance_idx'instance_name);
+    constant C_PROC_NAME : string := "sbi_read";
     constant C_PROC_CALL : string := C_PROC_NAME & "(" & to_string(VVCT, vvc_instance_idx) -- First part common for all
                                      & ", " & to_string(addr, HEX, KEEP_LEADING_0, INCL_RADIX) & ")";
   begin
@@ -346,7 +346,7 @@ package body vvc_methods_pkg is
     constant scope               : in string         := C_VVC_CMD_SCOPE_DEFAULT;
     constant parent_msg_id_panel : in t_msg_id_panel := C_UNUSED_MSG_ID_PANEL -- Only intended for usage by parent HVVCs
   ) is
-    constant C_PROC_NAME : string := get_procedure_name_from_instance_name(vvc_instance_idx'instance_name);
+    constant C_PROC_NAME : string := "sbi_check";
     constant C_PROC_CALL : string := C_PROC_NAME & "(" & to_string(VVCT, vvc_instance_idx) -- First part common for all
                                      & ", " & to_string(addr, HEX, KEEP_LEADING_0, INCL_RADIX) & ", " & to_string(data, HEX, KEEP_LEADING_0, INCL_RADIX) & ")";
     variable v_normalised_addr : unsigned(shared_vvc_cmd.addr'length - 1 downto 0)         := normalize_and_check(addr, shared_vvc_cmd.addr, ALLOW_WIDER_NARROWER, "addr", "shared_vvc_cmd.addr", C_PROC_CALL & " called with too wide address." & add_msg_delimiter(msg));
@@ -381,7 +381,7 @@ package body vvc_methods_pkg is
     constant scope               : in string         := C_VVC_CMD_SCOPE_DEFAULT;
     constant parent_msg_id_panel : in t_msg_id_panel := C_UNUSED_MSG_ID_PANEL -- Only intended for usage by parent HVVCs
   ) is
-    constant C_PROC_NAME : string := get_procedure_name_from_instance_name(vvc_instance_idx'instance_name);
+    constant C_PROC_NAME : string := "sbi_poll_until";
     constant C_PROC_CALL : string := C_PROC_NAME & "(" & to_string(VVCT, vvc_instance_idx) -- First part common for all
                                      & ", " & to_string(addr, HEX, KEEP_LEADING_0, INCL_RADIX) & ", " & to_string(data, HEX, KEEP_LEADING_0, INCL_RADIX) & ")";
     variable v_normalised_addr : unsigned(shared_vvc_cmd.addr'length - 1 downto 0)         := normalize_and_check(addr, shared_vvc_cmd.addr, ALLOW_WIDER_NARROWER, "addr", "shared_vvc_cmd.addr", C_PROC_CALL & " called with too wide address." & add_msg_delimiter(msg));
