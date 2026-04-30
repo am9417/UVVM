@@ -38,7 +38,8 @@ use bitvis_vip_spec_cov.spec_cov_pkg.all;
 -- Test bench entity
 entity uart_vvc_tb is
   generic (
-    GC_SCRIPT_PATH : string := ""
+    GC_TESTCASE    : natural := 0;
+    GC_SCRIPT_PATH : string  := ""
   );
 end entity;
 
@@ -46,17 +47,14 @@ end entity;
 architecture func of uart_vvc_tb is
 
   -- Assuming that the testbench is run from the sim folder
-  constant C_REQ_LIST_FILE      : string := GC_SCRIPT_PATH & "../demo/basic_usage/req_list_basic_demo.csv";
-  constant C_PARTIAL_COV_FILE   : string := GC_SCRIPT_PATH & "../sim/partial_cov_basic_demo.csv";
+  constant C_REQ_LIST_FILE      : string := GC_SCRIPT_PATH & "../tb/advanced_demo/req_list_advanced_demo.csv";
+  constant C_PARTIAL_COV_FILE   : string := GC_SCRIPT_PATH & "../sim/partial_cov_advanced_demo_T" & to_string(GC_TESTCASE) & ".csv";
 
   constant C_SCOPE              : string  := C_TB_SCOPE_DEFAULT;
 
   -- Clock and bit period settings
   constant C_CLK_PERIOD         : time := 10 ns;
   constant C_BIT_PERIOD         : time := 16 * C_CLK_PERIOD;
-
-  -- Time for one UART transmission to complete
-  constant C_TIME_OF_ONE_UART_TX : time := 11*C_BIT_PERIOD; -- =1760 ns;
 
   -- Predefined SBI addresses
   constant C_ADDR_RX_DATA       : unsigned(2 downto 0) := "000";
@@ -70,7 +68,7 @@ architecture func of uart_vvc_tb is
   -----------------------------------------------------------------------------
   -- Instantiate test harness, containing DUT and Executors
   -----------------------------------------------------------------------------
-  i_test_harness : entity work.uart_vvc_th(struct);
+  i_test_harness : entity work.uart_vvc_th;
 
 
   ------------------------------------------------
@@ -103,10 +101,6 @@ architecture func of uart_vvc_tb is
     enable_log_msg(UART_VVCT, 1, TX, ID_BFM);
 
 
-    log("Starting the requirement coverage process");
-    initialize_req_cov("T_UART_1", C_REQ_LIST_FILE, C_PARTIAL_COV_FILE);
-
-
     log(ID_LOG_HDR, "Starting simulation of TB for UART using VVCs", C_SCOPE);
     ------------------------------------------------------------
     log("Wait 10 clock period for reset to be turned off");
@@ -119,53 +113,88 @@ architecture func of uart_vvc_tb is
     shared_uart_vvc_config(TX,1).bfm_config.bit_time := C_BIT_PERIOD;
 
 
-    log(ID_LOG_HDR, "Check register defaults", C_SCOPE);
-    ------------------------------------------------------------
-    sbi_check(SBI_VVCT, 1, C_ADDR_RX_DATA, x"00", "RX_DATA default");
-    sbi_check(SBI_VVCT, 1, C_ADDR_TX_READY, x"01", "TX_READY default");
-    sbi_check(SBI_VVCT, 1, C_ADDR_RX_DATA_VALID, x"00", "RX_DATA_VALID default");
-    await_completion(SBI_VVCT,1,  10 * C_CLK_PERIOD);
-    -- Log the requirement FPGA_SPEC_1 after test has completed
-    tick_off_req_cov("FPGA_SPEC_1");
+    -- If statement to determine which testcase to run
+    if (GC_TESTCASE = 0) then
+      log("Starting the requirement coverage process");
+      initialize_req_cov("T_UART_DEFAULTS", C_REQ_LIST_FILE, C_PARTIAL_COV_FILE);
+
+      log(ID_LOG_HDR, "T_UART_DEFAULTS - Check register defaults", C_SCOPE);
+      ------------------------------------------------------------
+      sbi_check(SBI_VVCT, 1, C_ADDR_RX_DATA, x"00", "RX_DATA default");
+      await_completion(SBI_VVCT,1,  10 * C_CLK_PERIOD);
+      -- Log the requirement FPGA_SPEC_1.a after test has completed
+      tick_off_req_cov("FPGA_SPEC_1.a");
+
+      sbi_check(SBI_VVCT, 1, C_ADDR_TX_READY, x"01", "TX_READY default");
+      await_completion(SBI_VVCT,1,  10 * C_CLK_PERIOD);
+      -- Log the requirement FPGA_SPEC_1.b after test has completed
+      tick_off_req_cov("FPGA_SPEC_1.b");
+
+      sbi_check(SBI_VVCT, 1, C_ADDR_RX_DATA_VALID, x"00", "RX_DATA_VALID default");
+      await_completion(SBI_VVCT,1,  10 * C_CLK_PERIOD);
+      -- Log the requirement FPGA_SPEC_1.c after test has completed
+      tick_off_req_cov("FPGA_SPEC_1.c");
+
+      -- End the requirement coverage process
+      finalize_req_cov(VOID);
 
 
-    log(ID_LOG_HDR, "Check simple transmit", C_SCOPE);
-    ------------------------------------------------------------
-    sbi_write(SBI_VVCT,1,  C_ADDR_TX_DATA, x"55", "TX_DATA");
-    uart_expect(UART_VVCT,1,RX,  x"55", "Expecting data on UART RX");
-    await_completion(UART_VVCT,1,RX,  13 * C_BIT_PERIOD);
-    -- Log the requirement FPGA_SPEC_2 after test has completed
-    tick_off_req_cov("FPGA_SPEC_2");
-    wait for 200 ns;  -- margin
+    elsif (GC_TESTCASE = 1) then
+      log("Starting the requirement coverage process");
+      initialize_req_cov("T_UART_TX", C_REQ_LIST_FILE, C_PARTIAL_COV_FILE);
+
+      log(ID_LOG_HDR, "T_UART_TX - Check simple transmit", C_SCOPE);
+      ------------------------------------------------------------
+      sbi_write(SBI_VVCT,1,  C_ADDR_TX_DATA, x"55", "TX_DATA");
+      uart_expect(UART_VVCT,1,RX,  x"55", "Expecting data on UART RX");
+      await_completion(UART_VVCT,1,RX,  13 * C_BIT_PERIOD);
+      -- Log the requirement FPGA_SPEC_2 after test has completed
+      tick_off_req_cov("FPGA_SPEC_2");
+      wait for 200 ns;  -- margin
+
+      -- End the requirement coverage process
+      finalize_req_cov(VOID);
+
+      
+    elsif (GC_TESTCASE = 2) then
+      log("Starting the requirement coverage process");
+      initialize_req_cov("T_UART_RX", C_REQ_LIST_FILE, C_PARTIAL_COV_FILE);
+
+      log(ID_LOG_HDR, "T_UART_RX - Check simple receive", C_SCOPE);
+      ------------------------------------------------------------
+      uart_transmit(UART_VVCT,1,TX,  x"AA", "UART TX");
+      await_completion(UART_VVCT,1,TX,  13 * C_BIT_PERIOD);
+      wait for 200 ns;  -- margin
+      sbi_check(SBI_VVCT,1,  C_ADDR_RX_DATA, x"AA", "RX_DATA");
+      await_completion(SBI_VVCT,1,  13 * C_BIT_PERIOD);
+      -- Log the requirement FPGA_SPEC_3 after test has completed
+      tick_off_req_cov("FPGA_SPEC_3");
+
+      -- End the requirement coverage process
+      finalize_req_cov(VOID);
 
 
-    log(ID_LOG_HDR, "Check simple receive", C_SCOPE);
-    ------------------------------------------------------------
-    uart_transmit(UART_VVCT,1,TX,  x"AA", "UART TX");
-    await_completion(UART_VVCT,1,TX,  13 * C_BIT_PERIOD);
-    wait for 200 ns;  -- margin
-    sbi_check(SBI_VVCT,1,  C_ADDR_RX_DATA, x"AA", "RX_DATA");
-    await_completion(SBI_VVCT,1,  13 * C_BIT_PERIOD);
-    -- Log the requirement FPGA_SPEC_3 after test has completed
-    tick_off_req_cov("FPGA_SPEC_3");
+    elsif (GC_TESTCASE = 3) then
+      log("Starting the requirement coverage process");
+      initialize_req_cov("T_UART_SIMULTANEOUS", C_REQ_LIST_FILE, C_PARTIAL_COV_FILE);
 
+      log(ID_LOG_HDR, "T_UART_SIMULTANEOUS - Check single simultaneous transmit and receive", C_SCOPE);
+      ------------------------------------------------------------
+      sbi_write(SBI_VVCT,1,  C_ADDR_TX_DATA, x"B4", "TX_DATA");
+      uart_transmit(UART_VVCT,1,TX,  x"87", "UART TX");
+      uart_expect(UART_VVCT,1,RX,  x"B4", "Expecting data on UART RX");
+      await_completion(UART_VVCT,1,TX, 13 * C_BIT_PERIOD);
+      wait for 200 ns;  -- margin
+      sbi_check(SBI_VVCT,1,  C_ADDR_RX_DATA, x"87", "RX_DATA");
+      await_completion(SBI_VVCT,1,  13 * C_BIT_PERIOD);
+      -- Log the requirement FPGA_SPEC_4 after test has completed
+      tick_off_req_cov("FPGA_SPEC_4");
 
-    log(ID_LOG_HDR, "Check single simultaneous transmit and receive", C_SCOPE);
-    ------------------------------------------------------------
-    sbi_write(SBI_VVCT,1,  C_ADDR_TX_DATA, x"B4", "TX_DATA");
-    uart_transmit(UART_VVCT,1,TX,  x"87", "UART TX");
-    uart_expect(UART_VVCT,1,RX,  x"B4", "Expecting data on UART RX");
-    await_completion(UART_VVCT,1,TX, 13 * C_BIT_PERIOD);
-    wait for 200 ns;  -- margin
-    sbi_check(SBI_VVCT,1,  C_ADDR_RX_DATA, x"87", "RX_DATA");
-    await_completion(SBI_VVCT,1,  13 * C_BIT_PERIOD);
-    -- Log the requirement FPGA_SPEC_4 after test has completed
-    tick_off_req_cov("FPGA_SPEC_4");
+      -- End the requirement coverage process
+      finalize_req_cov(VOID);
 
+    end if;
 
-    -- End the requirement coverage process
-    finalize_req_cov(VOID);
-    
     -----------------------------------------------------------------------------
     -- Ending the simulation
     -----------------------------------------------------------------------------
