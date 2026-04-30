@@ -297,7 +297,7 @@ package body td_target_support_pkg is
 
     variable v_vvc_instance_idx : integer   := vvc_target.vvc_instance_idx;
     variable v_vvc_channel      : t_channel := vvc_target.vvc_channel;
-
+    variable v_timeout : time := timeout;
   begin
 
     check_value((shared_uvvm_state /= IDLE), TB_FAILURE, "UVVM will not work without uvvm_vvc_framework.ti_uvvm_engine instantiated in the test harness", scope, ID_NEVER, msg_id_panel);
@@ -346,9 +346,12 @@ package body td_target_support_pkg is
     wait for 0 ns;
     -- the default value of vvc_target drives trigger to 'L' again
     vvc_target         <= set_vvc_target_defaults(vvc_target.vvc_name, scope);
+      if timeout = 0 ns then
+        v_timeout := 1 ns;
+      end if;
 
     while v_ack_cmd_idx /= v_local_cmd_idx loop
-      wait until global_vvc_ack = '1' for ((v_start_time + timeout) - now);
+      wait until global_vvc_ack = '1' for ((v_start_time + v_timeout) - now);
       v_ack_cmd_idx := protected_acknowledge_index.get_index;
 
       if not (global_vvc_ack'event) then
