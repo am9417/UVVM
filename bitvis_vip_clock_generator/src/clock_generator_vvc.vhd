@@ -128,6 +128,7 @@ begin
                                                         instance => GC_INSTANCE_IDX);
 
     vvc_registered <= '1';
+    wait for 0 ns;
     -- Set initial value of v_msg_id_panel to msg_id_panel in config
     v_msg_id_panel                                        := vvc_config.msg_id_panel;
 
@@ -205,7 +206,9 @@ begin
 
     loop
 
-      wait until vvc_registered = '1';
+      if vvc_registered = '0' then
+        wait until vvc_registered = '1';
+      end if;
       -- update vvc activity
       update_vvc_activity_register(global_trigger_vvc_activity_register, vvc_status, INACTIVE, entry_num_in_vvc_activity_register, C_EXECUTOR_ID, last_cmd_idx_executed, command_queue.is_empty(VOID), C_SCOPE);
 
