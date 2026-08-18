@@ -485,11 +485,7 @@ package body td_vvc_framework_common_methods_pkg is
     constant scope               : in string         := C_VVC_CMD_SCOPE_DEFAULT;
     constant parent_msg_id_panel : in t_msg_id_panel := shared_msg_id_panel --UVVM: temporary fix for HVVC, replace for C_UNUSED_MSG_ID_PANEL in v3.0
   ) is
-    constant C_PROC_NAME : string := "await_completion";
-    constant C_PROC_CALL : string := C_PROC_NAME & "(" & to_string(vvc_target, vvc_instance_idx, vvc_channel) -- First part common for all
-                                     & ", " & to_string(wanted_idx) & ", " & to_string(timeout, ns) & ")";
-    constant C_PROC_CALL_SHORT : string := C_PROC_NAME & "(" & to_string(vvc_target, vvc_instance_idx, vvc_channel) -- First part common for all
-                                           & ", " & to_string(timeout, ns) & ")";
+
     variable v_msg_id_panel                 : t_msg_id_panel                         := shared_msg_id_panel;
     variable v_proc_call                    : line;
     variable v_vvc_idx_in_activity_register : t_integer_array(0 to C_MAX_TB_VVC_NUM) := (others => -1);
@@ -497,6 +493,12 @@ package body td_vvc_framework_common_methods_pkg is
     variable v_vvc_instance_idx             : integer                                := vvc_instance_idx;
     variable v_vvc_channel                  : t_channel                              := vvc_channel;
     variable v_vvc_list                     : t_prot_vvc_list;
+
+    constant C_PROC_NAME : string := "await_completion";
+    constant C_PROC_CALL : string := C_PROC_NAME & "(" & to_string(vvc_target, vvc_instance_idx, vvc_channel) -- First part common for all
+                                     & ", " & to_string(wanted_idx) & ", " & to_string(timeout, ns) & ")";
+    constant C_PROC_CALL_SHORT : string := C_PROC_NAME & "(" & to_string(vvc_target, vvc_instance_idx, vvc_channel) -- First part common for all
+                                           & ", " & to_string(timeout, ns) & ")";
 
   begin
 
