@@ -234,17 +234,18 @@ begin
     uart_vvc_sb.config(GC_INSTANCE_IDX, C_SB_CONFIG_DEFAULT);
 
     loop
-
-      wait until vvc_registered = '1';
+      if vvc_registered = '0' then
+        wait until vvc_registered = '1';
+      end if;
       -- update vvc activity
-      update_vvc_activity_register(global_trigger_vvc_activity_register, vvc_status, INACTIVE, entry_num_in_vvc_activity_register, C_EXECUTOR_ID, last_cmd_idx_executed, command_queue.is_empty(VOID), C_SCOPE);
+      update_vvc_activity_register(global_trigger_vvc_activity_register, vvc_status, INACTIVE, entry_num_in_vvc_activity_register, C_EXECUTOR_ID, last_cmd_idx_executed, command_queue, C_SCOPE);
 
       -- 1. Set defaults, fetch command and log
       -------------------------------------------------------------------------
       work.td_vvc_entity_support_pkg.fetch_command_and_prepare_executor(v_cmd, command_queue, vvc_config, vvc_status, queue_is_increasing, executor_is_busy, C_VVC_LABELS);
 
       -- update vvc activity
-      update_vvc_activity_register(global_trigger_vvc_activity_register, vvc_status, ACTIVE, entry_num_in_vvc_activity_register, C_EXECUTOR_ID, last_cmd_idx_executed, command_queue.is_empty(VOID), C_SCOPE);
+      update_vvc_activity_register(global_trigger_vvc_activity_register, vvc_status, ACTIVE, entry_num_in_vvc_activity_register, C_EXECUTOR_ID, last_cmd_idx_executed, command_queue, C_SCOPE);
 
       v_num_data_bits := vvc_config.bfm_config.num_data_bits;
 
@@ -404,7 +405,9 @@ begin
     variable v_activity : t_activity;
   begin
     -- Add a delay to allow the VVC to be registered in the activity register
-    wait until vvc_registered = '1';
+    if vvc_registered = '0' then
+      wait until vvc_registered = '1';
+    end if;
     --wait for std.env.resolution_limit;
 
     loop

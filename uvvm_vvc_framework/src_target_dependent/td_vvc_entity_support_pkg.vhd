@@ -330,7 +330,7 @@ package td_vvc_entity_support_pkg is
     constant entry_num_in_vvc_activity_register   : in integer;
     constant executor_id                          : in natural;
     constant last_cmd_idx_executed                : in integer;
-    constant command_queue_is_empty               : in boolean;
+    variable command_queue       : inout work.td_cmd_queue_pkg.t_generic_queue;
     constant scope                                : in string := C_VVC_NAME
   );
 
@@ -1034,7 +1034,7 @@ package body td_vvc_entity_support_pkg is
     constant entry_num_in_vvc_activity_register   : in integer;
     constant executor_id                          : in natural;
     constant last_cmd_idx_executed                : in integer;
-    constant command_queue_is_empty               : in boolean;
+    variable command_queue       : inout work.td_cmd_queue_pkg.t_generic_queue;
     constant scope                                : in string := C_VVC_NAME
   ) is
     variable v_activity : t_activity := activity;
@@ -1047,7 +1047,7 @@ package body td_vvc_entity_support_pkg is
       vvc_status.current_cmd_idx  := 0;
     end if;
 
-    if v_activity = INACTIVE and not (command_queue_is_empty) then
+    if v_activity = INACTIVE and not (command_queue.is_empty(VOID)) then
       v_activity := ACTIVE;
     end if;
     shared_vvc_activity_register.priv_report_vvc_activity(vvc_idx               => entry_num_in_vvc_activity_register,
